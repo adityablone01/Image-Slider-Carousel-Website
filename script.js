@@ -1,61 +1,149 @@
-let items = document.querySelectorAll('.slider .list .item');
-let next = document.getElementById('next');
-let prev = document.getElementById('prev');
-let thumbnails = document.querySelectorAll('.thumbnail .item');
+// ================= SELECT ELEMENTS =================
+const slider = document.querySelector('.slider');
+const items = document.querySelectorAll('.slider .list .item');
+const thumbnails = document.querySelectorAll('.thumbnail .item');
+const next = document.getElementById('next');
+const prev = document.getElementById('prev');
 
-// config param
+// ================= CONFIG =================
 let countItem = items.length;
 let itemActive = 0;
-// event next click
-next.onclick = function(){
-    itemActive = itemActive + 1;
-    if(itemActive >= countItem){
-        itemActive = 0;
-    }
-    showSlider();
-}
-//event prev click
-prev.onclick = function(){
-    itemActive = itemActive - 1;
-    if(itemActive < 0){
-        itemActive = countItem - 1;
-    }
-    showSlider();
-}
-// auto run slider
-let refreshInterval = setInterval(() => {
-    next.click();
-}, 5000)
-function showSlider(){
-    // remove item active old
-    let itemActiveOld = document.querySelector('.slider .list .item.active');
-    let thumbnailActiveOld = document.querySelector('.thumbnail .item.active');
-    itemActiveOld.classList.remove('active');
-    thumbnailActiveOld.classList.remove('active');
+let autoSlideDelay = 5000;
+let refreshInterval;
 
-    // active new item
+// ================= PROGRESS BAR =================
+const progressBar = document.createElement('div');
+progressBar.style.position = 'absolute';
+progressBar.style.bottom = '0';
+progressBar.style.left = '0';
+progressBar.style.height = '4px';
+progressBar.style.background = 'white';
+progressBar.style.width = '0%';
+progressBar.style.transition = `width ${autoSlideDelay}ms linear`;
+slider.appendChild(progressBar);
+
+// ================= FUNCTIONS =================
+
+// Lazy load images
+function lazyLoad(index){
+    const img = items[index].querySelector('img');
+    if(img && !img.getAttribute('src')){
+        img.src = img.dataset.src;
+    }
+}
+
+// Show slider
+function showSlider(){
+    const current = document.querySelector('.item.active');
+    const currentThumb = document.querySelector('.thumbnail .item.active');
+
+    if(current) current.classList.remove('active');
+    if(currentThumb) currentThumb.classList.remove('active');
+
     items[itemActive].classList.add('active');
     thumbnails[itemActive].classList.add('active');
+
+    lazyLoad(itemActive);
     setPositionThumbnail();
 
-    // clear auto time run slider
-    clearInterval(refreshInterval);
-    refreshInterval = setInterval(() => {
-        next.click();
-    }, 5000)
+    resetAutoSlide();
 }
-function setPositionThumbnail () {
-    let thumbnailActive = document.querySelector('.thumbnail .item.active');
-    let rect = thumbnailActive.getBoundingClientRect();
-    if (rect.left < 0 || rect.right > window.innerWidth) {
-        thumbnailActive.scrollIntoView({ behavior: 'smooth', inline: 'nearest' });
+
+// Next / Prev
+function nextSlide(){
+    itemActive = (itemActive + 1) % countItem;
+    showSlider();
+}
+
+function prevSlide(){
+    itemActive = (itemActive - 1 + countItem) % countItem;
+    showSlider();
+}
+
+// Thumbnail scroll
+function setPositionThumbnail(){
+    const activeThumb = thumbnails[itemActive];
+    const rect = activeThumb.getBoundingClientRect();
+
+    if(rect.left < 0 || rect.right > window.innerWidth){
+        activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     }
 }
 
-// click thumbnail
-thumbnails.forEach((thumbnail, index) => {
-    thumbnail.addEventListener('click', () => {
+// Auto slide with progress bar
+function startAutoSlide(){
+    progressBar.style.width = '0%';
+
+    setTimeout(() => {
+        progressBar.style.width = '100%';
+    }, 50);
+
+    refreshInterval = setInterval(nextSlide, autoSlideDelay);
+}
+
+function resetAutoSlide(){
+    clearInterval(refreshInterval);
+    progressBar.style.transition = 'none';
+    progressBar.style.width = '0%';
+
+    setTimeout(() => {
+        progressBar.style.transition = `width ${autoSlideDelay}ms linear`;
+        progressBar.style.width = '100%';
+    }, 50);
+
+    refreshInterval = setInterval(nextSlide, autoSlideDelay);
+}
+
+// ================= EVENTS =================
+
+// Buttons
+next.addEventListener('click', nextSlide);
+prev.addEventListener('click', prevSlide);
+
+// Thumbnail click
+thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener('click', () => {
         itemActive = index;
         showSlider();
-    })
-})
+    });
+});
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight') nextSlide();
+    if(e.key === 'ArrowLeft') prevSlide();
+});
+
+// Pause on hover
+slider.addEventListener('mouseenter', () => clearInterval(refreshInterval));
+slider.addEventListener('mouseleave', resetAutoSlide);
+
+// ================= SWIPE SUPPORT =================
+let startX = 0;
+
+slider.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+});
+
+slider.addEventListener('touchend', (e) => {
+    let endX = e.changedTouches[0].clientX;
+
+    if(startX - endX > 50){
+        nextSlide(); // swipe left
+    }
+    else if(endX - startX > 50){
+        prevSlide(); // swipe right
+    }
+});
+
+// ================= INIT =================
+items.forEach((item, index) => {
+    const img = item.querySelector('img');
+    if(img){
+        img.dataset.src = img.src;
+        if(index !== 0) img.removeAttribute('src');
+    }
+});
+
+lazyLoad(0);
+startAutoSlide();
