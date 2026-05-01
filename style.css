@@ -1,111 +1,113 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 :root{
     --main-color: #eee;
     --bg-color: #010101;
     --accent: #ffffff;
 }
 
-/* Reset */
+/* RESET */
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body */
+/* GLOBAL */
 body{
-    font-family: 'Poppins',sans-serif;
-    margin: 0;
-    background-color: #010101;
-    color: #eee;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--main-color);
+    overflow-x: hidden;
 }
 
-/* SVG */
+img{
+    max-width: 100%;
+    height: auto;
+}
+
 svg{
     width: 20px;
 }
 
 /* ================= HEADER ================= */
 header{
-    width: 1200px, 90%;
+    width: min(1200px, 90%);
     margin: auto;
     display: grid;
     grid-template-columns: auto 1fr auto;
-    justify-content: center;
     align-items: center;
+    padding: 10px 0;
     position: relative;
     z-index: 100;
 }
+
 header .logo{
     font-weight: bold;
 }
 
-/* Menu */
 header .menu{
-    padding: 0;
-    margin: 0;
     list-style: none;
     display: flex;
     justify-content: center;
     gap: 20px;
-    font-weight: 500;
+}
+
+header .menu a{
+    text-decoration: none;
+    color: var(--main-color);
 }
 
 /* ================= SLIDER ================= */
 .slider{
-    height: 100vh;
-    margin-top: -50px;
+    min-height: 100vh;
+    margin-top: -60px;
     position: relative;
 }
 
-/* Slides */
+/* SLIDES */
 .slider .list .item{
     position: absolute;
-    inset: 0 ;
-    overflow: hidden;
+    inset: 0;
     opacity: 0;
-    transition: .5s;
+    transition: opacity 0.5s ease;
 }
+
 .slider .list .item img{
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* Gradient overlay */
+/* OVERLAY */
 .slider .list .item::after{
-      content: '';
+    content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, #000 40%, transparent);
 }
 
-/* Content */
+/* CONTENT */
 .slider .list .item .content{
     position: absolute;
     left: 10%;
     top: 20%;
-    width: 500px;
-    max-width: 80%;
+    width: 90%;
+    max-width: 500px;
     z-index: 1;
 }
-.slider .list .item .content p:nth-child(1){
-    text-transform: uppercase;
-    letter-spacing: 10px;
-}
+
 .slider .list .item .content h2{
-    font-size:  clamp(32px, 8vw, 80px);
-    margin: 0;
+    font-size: clamp(32px, 6vw, 70px);
 }
 
-
-/* Active slide */
+/* ACTIVE */
 .slider .list .item.active{
     opacity: 1;
     z-index: 10;
 }
 
-/* Animation */
+/* ANIMATION */
 @keyframes showContent {
     to{
         transform: translateY(0);
@@ -113,6 +115,7 @@ header .menu{
         opacity: 1;
     }
 }
+
 .slider .list .item.active p:nth-child(1),
 .slider .list .item.active h2,
 .slider .list .item.active p:nth-child(3){
@@ -121,87 +124,119 @@ header .menu{
     opacity: 0;
     animation: showContent .5s .7s ease-in-out 1 forwards;
 }
+
 .slider .list .item.active h2{
-    animation-delay: 1s;
+    animation-delay: 0.5s;
 }
-.slider .list .item.active p:nth-child(3){
-    animation-duration: 1.3s;
-}
+
+.slider .list .item.active p:nth-child(3){ 
+    animation-duration: 1.3s; }
 
 /* ================= ARROWS ================= */
 .arrows{
     position: absolute;
     top: 50%;
-    transform: translate(-50%);
-    right: 50px;
+    right: 20px;
+    transform: translateY(-50%);
     z-index: 100;
 }
+
 .arrows button{
-    background-color: #eee5;
+    background: rgba(255,255,255,0.3);
     border: none;
-    font-family: monospace;
     width: 40px;
     height: 40px;
+    margin: 5px;
     border-radius: 5px;
-    font-size: x-large;
-    color: #eee;
-    transition: .5s;
-}
-.arrows button:hover{
-    background-color: #eee;
-    color: black;
+    color: white;
+    font-size: 18px;
     cursor: pointer;
+}
+
+.arrows button:hover{
+    background: white;
+    color: black;
 }
 
 /* ================= THUMBNAIL ================= */
 .thumbnail{
     position: absolute;
-    bottom: 50px;
-    z-index: 11;
+    bottom: 20px;
     display: flex;
     gap: 10px;
     width: 100%;
-    height: 250px;
-    padding: 0 50px;
-    box-sizing: border-box;
-    overflow: auto;
-    justify-content: center;
+    overflow-x: auto;
+    padding: 0 20px;
     scrollbar-width: none;
+    z-index: 11;
 }
+
 .thumbnail::-webkit-scrollbar{
     display: none;
 }
+
 .thumbnail .item{
     position: relative;
-    width: 150px;
-    height: 220px;
-    filter: brightness(.5);
-    transition: .5s;
+    width: 120px;
+    height: 160px;
     flex-shrink: 0;
+    filter: brightness(0.5);
+    transition: .5s;
+    transition: 0.3s;
 }
+
 .thumbnail .item img{
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 10px;
-}
-.thumbnail .item.active{
-    filter: brightness(1.5);
+    border-radius: 8px;
 }
 
-/* Thumbnail text */
-.thumbnail .item .content{
-    position: absolute;
-    inset: auto 10px 10px 10px;
+.thumbnail .item.active{
+    filter: brightness(1.2);
 }
-@media screen and (max-width: 678px) {
-    .thumbnail{
-        justify-content: start;
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px){
+
+    header{
+        grid-template-columns: 1fr auto;
     }
+
+    header .menu{
+        display: none;
+    }
+
+    .slider .list .item .content{
+        left: 5%;
+        top: 15%;
+    }
+
     .slider .list .item .content h2{
-        font-size: 60px;
+        font-size: 36px;
     }
+
+    .slider .list .item .content p{
+        font-size: 14px;
+    }
+
+    .thumbnail{
+        bottom: 10px;
+        padding: 0 10px;
+    }
+
+    .thumbnail .item{
+        width: 90px;
+        height: 120px;
+    }
+
     .arrows{
-        top: 10%;
+        right: 10px;
+    }
+
+    .arrows button{
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
     }
 }
